@@ -37,7 +37,10 @@ jobs:
       # E2E smoke 跑在 preview server;通過才部署(部署閘門)
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
+      # enablement: 新 repo 的 Pages 預設未啟用——此參數自動開啟(首跑失敗教訓,2026-10-14)
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
