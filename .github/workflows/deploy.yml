@@ -1,0 +1,45 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # V0 尚無任何 VITE_ 環境注入;日後上線平台/AI 設定時,依家族 proven 模式加:
+      # env: + shell if(secrets 不可用於 step 的 if:)——見媒管庫 docs/INCIDENTS.md
+      - run: npm test
+      # WCAG AA 對比度(從 src/index.css 解析 token,未達標即失敗)
+      - run: npm run test:contrast
+      # build 內含 tsc -b 型別檢查
+      - run: npm run build
+      # E2E smoke 跑在 preview server;通過才部署(部署閘門)
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
