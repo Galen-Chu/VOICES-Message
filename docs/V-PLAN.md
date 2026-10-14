@@ -53,3 +53,4 @@
 
 - 文管庫=文字工作流、媒管庫=媒體發佈、本產品=聲音內容;**音轉影片的「影片發佈」屬媒管庫**,本產品只產出影片檔並交接;
 - 三 repo 各自部署、各自路線圖;家族契約變更須三庫同步協調。
+V0 上線紀錄:2026-10-14 晚 Pages 手動開啟後部署綠燈,https://galen-chu.github.io/VOICES-Message/ HTTP 200、bundle 探測通過(CI 新知:新 repo 首跑 enablement:true 仍報 Resource not accessible——首次必須人工開 Pages)
