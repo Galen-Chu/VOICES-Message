@@ -28,7 +28,7 @@ export default function App() {
 
         <div className="card" style={{ padding: 18, marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-            <span className="pill pill-purple">{VOICES_COPY.statusBadge}</span>
+            <span className="pill pill-brand">{VOICES_COPY.statusBadge}</span>
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>
               {VOICES_COPY.statusTitle}
             </span>
@@ -69,7 +69,7 @@ export default function App() {
                   fontSize: 11,
                   fontWeight: 700,
                   color: 'var(--brand)',
-                  background: 'var(--pill-purple-bg)',
+                  background: 'var(--pill-brand-bg)',
                   borderRadius: 8,
                   padding: '4px 9px',
                   height: 'fit-content',
