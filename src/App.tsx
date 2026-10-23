@@ -1,4 +1,5 @@
 import { VOICES_COPY } from './constants';
+import { BrandMark } from './components/BrandIcons';
 
 const ROADMAP: Array<{ phase: string; title: string; desc: string }> = [
   { phase: 'V0 ✅', title: '骨架與設計文件', desc: 'repo、V-PLAN、CI/Pages 部署管線、設計系統(自文管庫複製)+ 首批純邏輯(音檔類型偵測、錄音格式探測)' },
@@ -17,22 +18,7 @@ export default function App() {
     <div style={{ minHeight: '100vh' }}>
       <div style={{ padding: '36px 24px 24px', maxWidth: 860, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
-          <span
-            style={{
-              width: 46,
-              height: 46,
-              borderRadius: 13,
-              background: 'var(--brand-fill)',
-              color: '#fff',
-              fontSize: 24,
-              fontWeight: 900,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            聲
-          </span>
+          <BrandMark size={46} />
           <div>
             <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-main)' }}>{VOICES_COPY.brand}</div>
             <div style={{ fontSize: 12.5, color: 'var(--text-weak)' }}>VOICES-Message</div>
