@@ -39,7 +39,7 @@
 
 - **V0(✅ 2026-10-14)**:repo 與文件(V-PLAN/README/CLAUDE/LICENSE)、骨架(可建置可測試可部署)、設計系統、首批純邏輯:`src/utils/audioKind.ts`(音檔類型偵測)+ `src/utils/recorderMime.ts`(錄音格式探測)+ 測試;CI(test→contrast→build→E2E)與 Pages 部署管線。
 - **V1 瀏覽器錄音機**:MediaRecorder 錄音(暫停/續錄)、播放、下載(依格式給副檔名)、錄音列表(僅 metadata,localStorage `voices-message:v1`);麥克風權限與不支援環境的誠實降級。
-- **V2 講稿與 AI(候選,待拍板)**:講稿編輯(錄前大綱/錄後逐字稿);Gemini BYOK 音訊輸入(逐字稿/摘要/講稿生成);family handoff——講稿送文管庫(caption 工作流)。
+- **V2 講稿與 AI(候選,待拍板)**:講稿編輯(錄前大綱/錄後逐字稿);Gemini BYOK 音訊輸入(逐字稿/摘要/講稿生成);family handoff——講稿送文管庫(caption 工作流)。**2026-11-13 擴充:TTS 配音與字幕架構另立 `docs/TTS-PLAN.md` 規劃(TD 編號決議)**。
 - **V3 音轉影片分發**:canvas 波形+封面圖合成影片(純前端),交媒管庫發佈(family handoff 檔案或重選)。
 - **遠期 Podcast RSS**:音檔託管(Firstory/SoundOn API 或自建 R2)→ 觸發後端決策,與媒管庫 M3 圖床共用同一個「後端資料邊界」大定案,不逐案判。
 
