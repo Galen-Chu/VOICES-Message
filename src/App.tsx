@@ -1,119 +1,125 @@
-import { VOICES_COPY } from './constants';
-import { BrandMark } from './components/BrandIcons';
+/**
+ * 殼層(V1 三頁籤):聲管 Dashboard / 錄音機 Record / 錄音記錄 Records。
+ * hash 深連結(#record/#records,未知落 Dashboard;書籤與家族連結入口)。
+ * 狀態分工:records=metadata(落地 services/recordings)、sessions=本工作階段音檔
+ * (blob+object URL 僅記憶體——紅線:音檔絕不落地;刪除時 revoke URL)。
+ * 切頁籤不清洗 sessions:錄完到記錄頁播放/下載,回錄音頁再錄,音檔都在(同分頁記憶體)。
+ */
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Dashboard from './components/Dashboard';
+import RecordPage from './components/RecordPage';
+import RecordingsPage, { type SessionAudio } from './components/RecordingsPage';
+import Sidebar from './components/Sidebar';
+import { NOTICE_COPY } from './constants';
+import type { RecordingResult } from './hooks/useRecorder';
+import {
+  addRecording,
+  deleteRecording,
+  loadRecordings,
+  updateRecording,
+  type RecordingMeta,
+} from './services/recordings';
+import type { TabKey } from './types';
+import { detectAudioKind } from './utils/audioKind';
+import { formatDateTime } from './utils/format';
 
-const ROADMAP: Array<{ phase: string; title: string; desc: string }> = [
-  { phase: 'V0 ✅', title: '骨架與設計文件', desc: 'repo、V-PLAN、CI/Pages 部署管線、設計系統(自文管庫複製)+ 首批純邏輯(音檔類型偵測、錄音格式探測)' },
-  { phase: 'V1', title: '瀏覽器錄音機', desc: 'MediaRecorder 錄音/暫停/播放/下載;錄音列表(僅 metadata 落地);格式探測適配 Chrome/Firefox/Safari' },
-  { phase: 'V2', title: '講稿與 AI(候選)', desc: '講稿編輯(錄音前/後);Gemini BYOK 音訊輸入:逐字稿、摘要、講稿生成(瀏覽器直呼,零後端)——待拍板' },
-  { phase: 'V3', title: '音轉影片分發', desc: '波形+封面以 canvas 合成影片檔,交媒管庫發佈(家族 family:* 契約)——podcast RSS 託管屬遠期' },
-];
+const TAB_KEYS: readonly TabKey[] = ['dashboard', 'record', 'records'];
 
-const FAMILY: Array<{ name: string; desc: string; url: string }> = [
-  { name: 'TEXT-Message 文管庫', desc: '文字工作流:郵件 → 草稿 → AI 改寫 → 發文', url: 'https://galen-chu.github.io/TEXT-Message/' },
-  { name: 'MEDIA-Message 媒管庫', desc: '媒體發佈:圖片/影片直傳,平台原生排程', url: 'https://galen-chu.github.io/MEDIA-Message/' },
-];
+function tabFromHash(): TabKey {
+  const hash = window.location.hash.replace(/^#/, '');
+  return (TAB_KEYS as readonly string[]).includes(hash) ? (hash as TabKey) : 'dashboard';
+}
 
 export default function App() {
+  const [tab, setTab] = useState<TabKey>(() => tabFromHash());
+  const [records, setRecords] = useState<RecordingMeta[]>(() => loadRecordings());
+  const [sessions, setSessions] = useState<Record<string, SessionAudio>>({});
+  const [notice, setNotice] = useState<string | null>(null);
+  const noticeTimer = useRef<number | null>(null);
+
+  const showNotice = useCallback((msg: string) => {
+    setNotice(msg);
+    if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
+    noticeTimer.current = window.setTimeout(() => setNotice(null), 3000);
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
+    },
+    [],
+  );
+
+  // hash 深連結:書籤/家族連結以 #record 等開啟時切到對應頁籤
+  useEffect(() => {
+    const onHashChange = () => setTab(tabFromHash());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  const goTab = useCallback((next: TabKey) => {
+    setTab(next);
+    const target = next === 'dashboard' ? window.location.pathname + window.location.search : `#${next}`;
+    window.history.replaceState(null, '', target);
+  }, []);
+
+  const handleRecordingDone = useCallback(
+    (result: RecordingResult) => {
+      const meta: RecordingMeta = {
+        id: crypto.randomUUID(),
+        title: `錄音 ${formatDateTime(Date.now())}`,
+        mime: result.mime,
+        kind: detectAudioKind(result.mime, ''),
+        durationSec: result.durationSec,
+        sizeBytes: result.blob.size,
+        createdAt: Date.now(),
+        note: '',
+      };
+      const { recordings, saveFailed } = addRecording(meta);
+      setRecords(recordings);
+      setSessions((prev) => ({
+        ...prev,
+        [meta.id]: { blob: result.blob, url: URL.createObjectURL(result.blob) },
+      }));
+      showNotice(saveFailed ? NOTICE_COPY.saveFailed : NOTICE_COPY.saved);
+    },
+    [showNotice],
+  );
+
+  const handlePatch = useCallback((id: string, patch: { title?: string; note?: string }) => {
+    setRecords(updateRecording(id, patch));
+  }, []);
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      setRecords(deleteRecording(id));
+      setSessions((prev) => {
+        const entry = prev[id];
+        if (entry) URL.revokeObjectURL(entry.url);
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      showNotice(NOTICE_COPY.deleted);
+    },
+    [showNotice],
+  );
+
   return (
-    <div style={{ minHeight: '100vh' }}>
-      <div style={{ padding: '36px 24px 24px', maxWidth: 860, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
-          <BrandMark size={46} />
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-main)' }}>{VOICES_COPY.brand}</div>
-            <div style={{ fontSize: 12.5, color: 'var(--text-weak)' }}>VOICES-Message</div>
-          </div>
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
+      <Sidebar activeTab={tab} onTabChange={goTab} />
+      <main className="app-main" style={{ flex: 1, minWidth: 0 }}>
+        {tab === 'dashboard' && <Dashboard onGoRecord={() => goTab('record')} />}
+        {tab === 'record' && <RecordPage onRecordingDone={handleRecordingDone} />}
+        {tab === 'records' && (
+          <RecordingsPage records={records} sessions={sessions} onPatch={handlePatch} onDelete={handleDelete} />
+        )}
+      </main>
+      {notice && (
+        <div className="toast" role="status">
+          {notice}
         </div>
-        <div style={{ fontSize: 13.5, color: 'var(--text-sub)', marginBottom: 24 }}>{VOICES_COPY.tagline}</div>
-
-        <div className="card" style={{ padding: 18, marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-            <span className="pill pill-brand">{VOICES_COPY.statusBadge}</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>
-              {VOICES_COPY.statusTitle}
-            </span>
-          </div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-sub)', lineHeight: 1.7 }}>{VOICES_COPY.statusDesc}</div>
-        </div>
-
-        <div className="card" style={{ padding: 18, marginBottom: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
-            {VOICES_COPY.positioningTitle}
-          </div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-sub)', lineHeight: 1.7 }}>
-            {VOICES_COPY.positioningDesc}
-          </div>
-          <div
-            style={{
-              marginTop: 12,
-              padding: '10px 12px',
-              borderRadius: 10,
-              background: 'var(--surface-soft)',
-              fontSize: 12,
-              color: 'var(--text-weak)',
-              lineHeight: 1.7,
-            }}
-          >
-            🔒 {VOICES_COPY.redlineTitle}:{VOICES_COPY.redlineDesc}
-          </div>
-        </div>
-
-        <div className="card" style={{ padding: 18, marginBottom: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>
-            {VOICES_COPY.roadmapTitle}
-          </div>
-          {ROADMAP.map((r) => (
-            <div key={r.phase} style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: 'var(--brand)',
-                  background: 'var(--pill-brand-bg)',
-                  borderRadius: 8,
-                  padding: '4px 9px',
-                  height: 'fit-content',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {r.phase}
-              </span>
-              <div>
-                <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-main)' }}>{r.title}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-weak)', lineHeight: 1.6, marginTop: 2 }}>
-                  {r.desc}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="card" style={{ padding: 18 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
-            {VOICES_COPY.familyTitle}
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--text-faint)', marginBottom: 10 }}>{VOICES_COPY.familyDesc}</div>
-          {FAMILY.map((f) => (
-            <a
-              key={f.name}
-              href={f.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'block',
-                padding: '10px 12px',
-                borderRadius: 10,
-                marginBottom: 8,
-                border: '1px solid var(--border-2)',
-                textDecoration: 'none',
-              }}
-            >
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--brand)' }}>{f.name}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-weak)' }}>{f.desc}</div>
-            </a>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 }

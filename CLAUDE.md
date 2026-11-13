@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-VOICES-Message(聲管庫;repo Galen-Chu/VOICES-Message)— **聲音為主、文字是講稿**的聲音內容工作流:瀏覽器錄音、講稿整理、分發(下載/音轉影片交媒管庫)。與 TEXT-Message(文管庫)、MEDIA-Message(媒管庫)為家族產品,技術骨架與慣例整套沿用文管庫(見下);**目前狀態:V0 骨架(2026-10-14)**,產品決策與分期見 `docs/V-PLAN.md`(D1–D7 為暫行決議,動工前可推翻)。
+VOICES-Message(聲管庫;repo Galen-Chu/VOICES-Message)— **聲音為主、文字是講稿**的聲音內容工作流:瀏覽器錄音、講稿整理、分發(下載/音轉影片交媒管庫)。與 TEXT-Message(文管庫)、MEDIA-Message(媒管庫)為家族產品,技術骨架與慣例整套沿用文管庫(見下);**目前狀態:V1 瀏覽器錄音機(2026-11-13)**,產品決策與分期見 `docs/V-PLAN.md`(D1–D7 為暫行決議,動工前可推翻)。
 
 ## 常用指令
 
@@ -12,12 +12,15 @@ npm run test:e2e   # Playwright E2E(serve dist;跑之前先 npm run build)
 npm run test:contrast  # WCAG AA 對比度稽核(scripts/contrast-audit.mjs)
 ```
 
-## 架構(V0 骨架;V1 起擴充)
+## 架構(V1 錄音機)
 
 - 前端:React 19 + TypeScript 7(strict)+ Vite 8(文管庫 2026-10-06 升級後同版工具鏈,家族最現代版)
-- `src/App.tsx` — V0 殼層(品牌/定位/路線/家族連結);V1 將以錄音機 IA 取代
-- `src/utils/audioKind.ts` — 音檔類型偵測純函式(MIME 前綴優先、副檔名 fallback;供 V1 錄音機與音檔匯入)
-- `src/utils/recorderMime.ts` — MediaRecorder 格式探測純函式(候選優先序 webm→mp4→ogg;`isTypeSupported` 注入保持可測)
+- `src/App.tsx` — 殼層:三頁籤(聲管 Dashboard / 錄音機 Record / 錄音記錄 Records;hash 深連結 `#record`/`#records`)+ 狀態分工(records=metadata 落地、sessions=本工作階段音檔 blob+object URL 僅記憶體、刪除時 revoke)
+- `src/hooks/useRecorder.ts` — 錄音狀態機(**全專案唯一碰 MediaRecorder/getUserMedia 的層**):idle→starting→recording⇄paused→idle、error(含錯誤碼);計時走 recorderClock 區段(暫停不計);stop() 以 Promise 回傳 `{blob, mime, durationSec}`;卸載清理停用麥克風軌
+- `src/services/recordings.ts` — 錄音記錄 metadata 存取(storage 可注入、防禦式解析單筆壞不連坐、永不拋;鏡像媒管庫 library.ts 模式)
+- `src/utils/` 純邏輯:`format`(時長/大小/M-D HH:mm)、`recorderClock`(區段計時)、`downloadName`(Windows 非法字元防護)、`recorderErrors`(麥克風例外→可行動錯誤碼)+ V0 的 `audioKind`/`recorderMime`
+- `src/components/` — Sidebar(三頁籤,鏡像媒管庫;家族切換連結留待 V2/V3 handoff)/ Dashboard(V0 落地頁+錄音入口)/ RecordPage / RecordingsPage(inline 編輯標題說明、刪除確認 Modal)/ ConfirmModal(Esc+初始焦點)
+- `src/constants.ts` — UI 字串集中(TAB_LABELS/REC_COPY/RECORDER_ERROR_COPY/RECORDS_COPY/NOTICE_COPY)
 - `src/index.css` — 設計系統自文管庫整套複製(深色模式、WCAG AA 已驗證 token;調整 palette 時重跑 `npm run test:contrast`)
 - `vite.config.ts` 的 `base: '/VOICES-Message/'` 為 Pages 子路徑所需,勿移除
 - 後端:**無**(V0–V3 設計零後端;podcast 託管屬遠期,屆時才觸發後端決策)
@@ -47,7 +50,7 @@ npm run test:contrast  # WCAG AA 對比度稽核(scripts/contrast-audit.mjs)
 
 ## 開發待辦
 
-- **V1 瀏覽器錄音機**(下一期):MediaRecorder 錄/停/暫停/播放/下載、格式探測(候選已在 `recorderMime.ts`)、錄音列表(僅 metadata 落地 `voices-message:v1`)、麥克風權限與不支援環境降級
-- V2 講稿與 AI(候選,待維護者拍板):Gemini BYOK 音訊輸入(逐字稿/摘要/講稿生成)
+- ~~V1 瀏覽器錄音機~~(**2026-11-13 完成**:錄/暫停/續錄/停止、播放、下載(副檔名依格式)、錄音記錄(metadata 落地 `voices-message:v1`)、標題/說明 inline 編輯、刪除確認 Modal、麥克風權限與不支援環境誠實降級;45 測/對比度/E2E 4 全綠——E2E 含 headless 無麥克風權限的降級路徑驗證)
+- V2 講稿與 AI(候選,待維護者拍板):Gemini BYOK 音訊輸入(逐字稿/摘要/講稿生成);TTS 配音架構另見 `docs/TTS-PLAN.md`(TD-3 本機引擎拍板前不安裝)
 - V3 音轉影片:canvas 波形+封面合成 → family handoff 交媒管庫
 - 遠期:Podcast RSS(觸發後端決策,與媒管庫 M3 圖床共用一次大定案)
