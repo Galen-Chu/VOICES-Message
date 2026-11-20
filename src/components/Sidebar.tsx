@@ -1,9 +1,10 @@
 /**
- * 側欄(V1 殼層,結構複製媒管庫 Sidebar.tsx):三頁籤——聲管 Dashboard/錄音機 Record/
+ * 側欄(V1 殼層,結構複製媒管庫 Sidebar.tsx):三頁籤——聲管 Dashboard/編發器 Voices/
  * 錄音記錄 Records。窄螢幕(≤720px)收合慣例由既有 CSS class 負責(.nav-label 收文字)。
- * V1 刻意不加家族切換連結(兩庫的 U2 側欄切換):V2/V3 handoff 上線時比照兩庫同位置補上。
+ * 家族常駐切換(2026-11-20 三方互連,比照兩庫 U2):兩條連結放識別塊外面、同位置同樣式;
+ * 原規劃留待 V2/V3 handoff,提前上線=導覽不等契約(維護者 2026-11-20 拍板)。
  */
-import { APP_TITLE, SIDEBAR_IDENTITY_SUB, TAB_LABELS } from '../constants';
+import { APP_TITLE, FAMILY_LINKS, SIDEBAR_IDENTITY_SUB, TAB_LABELS } from '../constants';
 import type { TabKey } from '../types';
 import type { ReactNode } from 'react';
 import { BrandMark, IconDashboard, IconLedger, IconWave } from './BrandIcons';
@@ -24,7 +25,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     <div className="app-sidebar">
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 8px 24px 8px' }}>
         <BrandMark size={36} />
-        <div className="sidebar-brand-text" style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-main)' }}>
+        <div className="sidebar-brand-text t-card-title">
           {APP_TITLE}
         </div>
       </div>
@@ -36,7 +37,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             <button
               key={item.key}
               type="button"
-              className="nav-btn"
+              className="nav-btn t-body"
               onClick={() => onTabChange(item.key)}
               aria-current={active ? 'page' : undefined}
               style={{
@@ -45,14 +46,13 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
                 gap: 10,
                 padding: '10px 12px',
                 borderRadius: 10,
-                fontSize: 13.5,
                 textAlign: 'left',
-                fontWeight: active ? 700 : 500,
+                fontWeight: active ? 'var(--weight-bold)' : 'var(--weight-medium)',
                 color: active ? 'var(--brand)' : 'var(--text-sub)',
                 background: active ? 'var(--pill-brand-bg)' : 'transparent',
               }}
             >
-              <span style={{ fontSize: 18 }} aria-hidden="true">
+              <span className="t-emoji" aria-hidden="true">
                 {item.icon}
               </span>
               <span className="nav-label">{item.label}</span>
@@ -72,10 +72,41 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       >
         <BrandMark size={34} />
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{APP_TITLE}</div>
-          <div style={{ fontSize: 11, color: 'var(--text-weak)' }}>{SIDEBAR_IDENTITY_SUB}</div>
+          <div className="t-sec-title">{APP_TITLE}</div>
+          <div className="t-meta">{SIDEBAR_IDENTITY_SUB}</div>
         </div>
       </div>
+
+      {/*
+        家族常駐切換(2026-11-20 三方互連,比照兩庫 U2 慣例):刻意放在識別塊外面——
+        `.sidebar-footer` 在 ≤720px 整塊 display:none,放裡面窄螢幕就沒有入口可按。
+        沿用 `.nav-label` 收合慣例:窄螢幕只留圖示(靠 title 提示)。
+      */}
+      {FAMILY_LINKS.map((f) => (
+        <a
+          key={f.url}
+          className="nav-btn sidebar-family-link t-sub"
+          href={f.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={f.title}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '10px 12px',
+            borderRadius: 10,
+            fontWeight: 'var(--weight-semibold)',
+            color: 'var(--brand)',
+            textDecoration: 'none',
+          }}
+        >
+          <span className="t-emoji" aria-hidden="true">
+            {f.icon}
+          </span>
+          <span className="nav-label">{f.label}</span>
+        </a>
+      ))}
     </div>
   );
 }

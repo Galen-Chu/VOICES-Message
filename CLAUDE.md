@@ -9,19 +9,20 @@ npm run dev        # 開發伺服器
 npm run build      # tsc -b + vite build
 npm test           # 單元測試(vitest)
 npm run test:e2e   # Playwright E2E(serve dist;跑之前先 npm run build)
-npm run test:contrast  # WCAG AA 對比度稽核(scripts/contrast-audit.mjs)
+npm run test:contrast    # WCAG AA 對比度稽核(scripts/contrast-audit.mjs)
+npm run test:typography  # 字體規格稽核(scripts/typography-audit.mjs;2026-11-20 自文管庫推廣,接入 ci.yml/deploy.yml)
 ```
 
 ## 架構(V1 錄音機)
 
 - 前端:React 19 + TypeScript 7(strict)+ Vite 8(文管庫 2026-10-06 升級後同版工具鏈,家族最現代版)
-- `src/App.tsx` — 殼層:三頁籤(聲管 Dashboard / 錄音機 Record / 錄音記錄 Records;hash 深連結 `#record`/`#records`)+ 狀態分工(records=metadata 落地、sessions=本工作階段音檔 blob+object URL 僅記憶體、刪除時 revoke)
+- `src/App.tsx` — 殼層:三頁籤(聲管 Dashboard / 編發器 Voices / 錄音記錄 Records;hash 深連結 `#record`/`#records`)。**「編發器 Voices」= 2026-11-20 更名(原「錄音機 Record」,V-PLAN D8:三庫編輯頁家族統一「編發器+英文詞」——文管庫 Draft/媒管庫 Media/聲管庫 Voices)**;僅顯示層更名,Tab key `record` 不動(家族「內部識別字不隨顯示名變動」慣例)+ 狀態分工(records=metadata 落地、sessions=本工作階段音檔 blob+object URL 僅記憶體、刪除時 revoke)
 - `src/hooks/useRecorder.ts` — 錄音狀態機(**全專案唯一碰 MediaRecorder/getUserMedia 的層**):idle→starting→recording⇄paused→idle、error(含錯誤碼);計時走 recorderClock 區段(暫停不計);stop() 以 Promise 回傳 `{blob, mime, durationSec}`;卸載清理停用麥克風軌
 - `src/services/recordings.ts` — 錄音記錄 metadata 存取(storage 可注入、防禦式解析單筆壞不連坐、永不拋;鏡像媒管庫 library.ts 模式)
 - `src/utils/` 純邏輯:`format`(時長/大小/M-D HH:mm)、`recorderClock`(區段計時)、`downloadName`(Windows 非法字元防護)、`recorderErrors`(麥克風例外→可行動錯誤碼)+ V0 的 `audioKind`/`recorderMime`
-- `src/components/` — Sidebar(三頁籤,鏡像媒管庫;家族切換連結留待 V2/V3 handoff)/ Dashboard(V0 落地頁+錄音入口)/ RecordPage / RecordingsPage(inline 編輯標題說明、刪除確認 Modal)/ ConfirmModal(Esc+初始焦點)
+- `src/components/` — Sidebar(三頁籤,鏡像媒管庫;家族切換連結 2026-11-20 三方互連上線——原規劃留待 V2/V3 handoff,維護者拍板提前)/ Dashboard(V0 落地頁+錄音入口)/ RecordPage / RecordingsPage(inline 編輯標題說明、刪除確認 Modal)/ ConfirmModal(Esc+初始焦點)
 - `src/constants.ts` — UI 字串集中(TAB_LABELS/REC_COPY/RECORDER_ERROR_COPY/RECORDS_COPY/NOTICE_COPY)
-- `src/index.css` — 設計系統自文管庫整套複製(深色模式、WCAG AA 已驗證 token;調整 palette 時重跑 `npm run test:contrast`)
+- `src/index.css` — 設計系統自文管庫整套複製(深色模式、WCAG AA 已驗證 token;調整 palette 時重跑 `npm run test:contrast`);**2026-11-20 字體規格系統自文管庫推廣**——`:root` 字級/字重/行高 token+`.t-*` 角色類別(級數表見文管庫 `docs/UIUX.md` §六),元件不得寫 inline 字級/字重/行高字面值(`npm run test:typography` 守門)
 - `vite.config.ts` 的 `base: '/VOICES-Message/'` 為 Pages 子路徑所需,勿移除
 - 後端:**無**(V0–V3 設計零後端;podcast 託管屬遠期,屆時才觸發後端決策)
 

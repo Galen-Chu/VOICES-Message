@@ -1,5 +1,5 @@
 /**
- * 錄音機頁(V1):狀態機 UI(idle/starting/recording ⇄ paused/error)+ 誠實降級。
+ * 編發器頁(V1,2026-11-20 前名「錄音機 Record」):狀態機 UI(idle/starting/recording ⇄ paused/error)+ 誠實降級。
  * 瀏覽器能力檢查在 render 時一次(recorderSupported);實際啟動的錯誤由 hook 狀態回報。
  * 停止後結果交 App 層(onRecordingDone)——存 metadata + 保留記憶體音檔給記錄頁。
  */
@@ -30,24 +30,20 @@ export default function RecordPage({ onRecordingDone }: RecordPageProps) {
 
   return (
     <div>
-      <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)' }}>{REC_COPY.pageTitle}</div>
-      <div style={{ fontSize: 12.5, color: 'var(--text-weak)', margin: '4px 0 20px' }}>{REC_COPY.pageDesc}</div>
+      <div className="t-page-title">{REC_COPY.pageTitle}</div>
+      <div className="t-page-desc" style={{ margin: '4px 0 20px' }}>{REC_COPY.pageDesc}</div>
 
       <div className="card" style={{ padding: 22, marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 14 }}>
           <span
+            className="t-sec-title"
             style={{
-              fontSize: 12.5,
-              fontWeight: 700,
               color: rec.status === 'recording' ? 'var(--error)' : 'var(--text-sub)',
             }}
           >
             {statusLabel}
           </span>
-          <span
-            style={{ fontSize: 26, fontWeight: 700, color: 'var(--text-main)', fontVariantNumeric: 'tabular-nums' }}
-            aria-label="已錄時間"
-          >
+          <span className="t-stat t-num" aria-label="已錄時間">
             {formatDuration(rec.elapsed)}
           </span>
         </div>
@@ -73,13 +69,12 @@ export default function RecordPage({ onRecordingDone }: RecordPageProps) {
         ) : (
           <div
             role="alert"
+            className="t-sub"
             style={{
               padding: '12px 14px',
               borderRadius: 10,
               background: 'var(--surface-soft)',
-              fontSize: 12.5,
               color: 'var(--text-sub)',
-              lineHeight: 1.7,
             }}
           >
             <strong style={{ color: 'var(--text-main)' }}>{REC_COPY.errorTitle}:</strong>
@@ -90,14 +85,13 @@ export default function RecordPage({ onRecordingDone }: RecordPageProps) {
         {rec.status === 'error' && rec.errorCode && (
           <div
             role="alert"
+            className="t-sub"
             style={{
               marginTop: 14,
               padding: '12px 14px',
               borderRadius: 10,
               background: 'var(--surface-soft)',
-              fontSize: 12.5,
               color: 'var(--text-sub)',
-              lineHeight: 1.7,
             }}
           >
             <strong style={{ color: 'var(--text-main)' }}>{REC_COPY.errorTitle}:</strong>
@@ -110,13 +104,11 @@ export default function RecordPage({ onRecordingDone }: RecordPageProps) {
       </div>
 
       <div
+        className="t-sub"
         style={{
           padding: '10px 12px',
           borderRadius: 10,
           background: 'var(--surface-soft)',
-          fontSize: 12,
-          color: 'var(--text-weak)',
-          lineHeight: 1.7,
         }}
       >
         🔒 {REC_COPY.honestNote}

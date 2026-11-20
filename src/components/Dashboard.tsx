@@ -23,21 +23,21 @@ interface DashboardProps {
 export default function Dashboard({ onGoRecord }: DashboardProps) {
   return (
     <div>
-      <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)' }}>
+      <div className="t-page-title">
         {VOICES_COPY.brand}
       </div>
-      <div style={{ fontSize: 12.5, color: 'var(--text-weak)', marginBottom: 20, marginTop: 4 }}>
+      <div className="t-page-desc" style={{ marginBottom: 20, marginTop: 4 }}>
         {VOICES_COPY.tagline}
       </div>
 
       <div className="card" style={{ padding: 18, marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
           <span className="pill pill-brand">{VOICES_COPY.statusBadge}</span>
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>
+          <span className="t-sec-title">
             {VOICES_COPY.statusTitle}
           </span>
         </div>
-        <div style={{ fontSize: 12.5, color: 'var(--text-sub)', lineHeight: 1.7, marginBottom: 14 }}>
+        <div className="t-sub" style={{ color: 'var(--text-sub)', marginBottom: 14 }}>
           {VOICES_COPY.statusDesc}
         </div>
         <button type="button" className="btn btn-primary" onClick={onGoRecord}>
@@ -46,21 +46,19 @@ export default function Dashboard({ onGoRecord }: DashboardProps) {
       </div>
 
       <div className="card" style={{ padding: 18, marginBottom: 16 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
+        <div className="t-sec-title" style={{ marginBottom: 8 }}>
           {VOICES_COPY.positioningTitle}
         </div>
-        <div style={{ fontSize: 12.5, color: 'var(--text-sub)', lineHeight: 1.7 }}>
+        <div className="t-sub" style={{ color: 'var(--text-sub)' }}>
           {VOICES_COPY.positioningDesc}
         </div>
         <div
+          className="t-sub"
           style={{
             marginTop: 12,
             padding: '10px 12px',
             borderRadius: 10,
             background: 'var(--surface-soft)',
-            fontSize: 12,
-            color: 'var(--text-weak)',
-            lineHeight: 1.7,
           }}
         >
           🔒 {VOICES_COPY.redlineTitle}:{VOICES_COPY.redlineDesc}
@@ -68,16 +66,16 @@ export default function Dashboard({ onGoRecord }: DashboardProps) {
       </div>
 
       <div className="card" style={{ padding: 18, marginBottom: 16 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>
+        <div className="t-sec-title" style={{ marginBottom: 12 }}>
           {VOICES_COPY.roadmapTitle}
         </div>
         {ROADMAP.map((r) => (
           <div key={r.phase} style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
             <span
+              className="t-meta"
               style={{
-                fontSize: 11,
-                fontWeight: 700,
                 color: 'var(--brand)',
+                fontWeight: 'var(--weight-bold)',
                 background: 'var(--pill-brand-bg)',
                 borderRadius: 8,
                 padding: '4px 9px',
@@ -88,8 +86,8 @@ export default function Dashboard({ onGoRecord }: DashboardProps) {
               {r.phase}
             </span>
             <div>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-main)' }}>{r.title}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-weak)', lineHeight: 1.6, marginTop: 2 }}>
+              <div className="t-item-title">{r.title}</div>
+              <div className="t-sub" style={{ marginTop: 2 }}>
                 {r.desc}
               </div>
             </div>
@@ -98,10 +96,10 @@ export default function Dashboard({ onGoRecord }: DashboardProps) {
       </div>
 
       <div className="card" style={{ padding: 18 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
+        <div className="t-sec-title" style={{ marginBottom: 8 }}>
           {VOICES_COPY.familyTitle}
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-faint)', marginBottom: 10 }}>{VOICES_COPY.familyDesc}</div>
+        <div className="t-meta" style={{ marginBottom: 10 }}>{VOICES_COPY.familyDesc}</div>
         {FAMILY.map((f) => (
           <a
             key={f.name}
@@ -117,8 +115,8 @@ export default function Dashboard({ onGoRecord }: DashboardProps) {
               textDecoration: 'none',
             }}
           >
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--brand)' }}>{f.name}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-weak)' }}>{f.desc}</div>
+            <div className="t-item-title" style={{ color: 'var(--brand)' }}>{f.name}</div>
+            <div className="t-sub">{f.desc}</div>
           </a>
         ))}
       </div>

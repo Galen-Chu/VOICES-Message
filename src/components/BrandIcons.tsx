@@ -71,7 +71,7 @@ export function IconDashboard({ size = 18 }: { size?: number }): ReactNode {
   );
 }
 
-/** 科學「波」——錄音機 Record(聲波;造型逐字複製自 icons/symbols/science/wave.svg)。 */
+/** 科學「波」——編發器 Voices 頁(聲波;造型逐字複製自 icons/symbols/science/wave.svg)。 */
 export function IconWave({ size = 18 }: { size?: number }): ReactNode {
   return (
     <NavIcon size={size}>

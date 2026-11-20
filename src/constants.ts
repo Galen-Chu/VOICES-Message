@@ -7,9 +7,37 @@ import type { AudioKind } from './utils/audioKind';
 export const APP_TITLE = '聲管庫 Voices';
 export const SIDEBAR_IDENTITY_SUB = 'VOICES-Message';
 
+/**
+ * 側欄家族常駐切換(2026-11-20 三方互連,比照兩庫 U2 慣例):放識別塊外、窄螢幕只留圖示。
+ * 與兩庫尚無 `family:*` 契約,純導覽連結;深層串接待 V2/V3 handoff。
+ * icon=對方產品的象徵(✍️ 文字 / 🎬 媒體),與兩庫側欄連結的選法一致。
+ */
+export const FAMILY_LINKS: ReadonlyArray<{
+  icon: string;
+  label: string;
+  title: string;
+  url: string;
+}> = [
+  {
+    icon: '✍️',
+    label: '文管庫 ↗',
+    title: '前往文管庫(文字發文:郵件→草稿→發佈)',
+    url: 'https://galen-chu.github.io/TEXT-Message/',
+  },
+  {
+    icon: '🎬',
+    label: '媒管庫 ↗',
+    title: '前往媒管庫(圖片/影片發佈)',
+    url: 'https://galen-chu.github.io/MEDIA-Message/',
+  },
+];
+
 export const TAB_LABELS: Record<TabKey, string> = {
   dashboard: '聲管 Dashboard',
-  record: '錄音機 Record',
+  // 2026-11-20 更名「錄音機 Record」→「編發器 Voices」:三庫編輯頁家族統一「編發器+英文詞」
+  // (文管庫 Draft/媒管庫 Media/聲管庫 Voices,維護者拍板)。僅改顯示層——
+  // 內部 key 'record' 與 #record 深連結依家族慣例(內部識別字不隨顯示名變動)。
+  record: '編發器 Voices',
   records: '錄音記錄 Records',
 };
 
@@ -29,12 +57,12 @@ export const VOICES_COPY = {
   familyDesc: '同源部署、各自獨立repo,跨產品走 family:* 契約鍵(見 V-PLAN §5)',
   redlineTitle: '資料紅線',
   redlineDesc: '音檔僅存瀏覽器記憶體、絕不落地、絕不經後端——落地僅 metadata(檔名/時長/大小/說明)',
-  ctaBtn: '前往錄音機',
+  ctaBtn: '開始錄音',
 };
 
-/** 錄音機頁(V1)。 */
+/** 編發器頁(V1,2026-11-20 前名「錄音機 Record」;頁內功能就是錄音)。 */
 export const REC_COPY = {
-  pageTitle: '錄音機 Record',
+  pageTitle: '編發器 Voices',
   pageDesc: '瀏覽器錄音:開始/暫停/續錄/停止,格式依瀏覽器自動探測(Chrome/Edge/Firefox=WebM、Safari=M4A)',
   startBtn: '開始錄音',
   startingBtn: '啟動麥克風…',
@@ -65,7 +93,7 @@ export const RECORDS_COPY = {
   honestDesc:
     '音檔僅存瀏覽器記憶體、絕不落地——這份清單只存 metadata。重新整理或關閉分頁後音檔即消失(記錄保留);要保留音檔請在離開前下載。',
   emptyTitle: '還沒有錄音記錄',
-  emptyDesc: '到「錄音機」錄第一段聲音。',
+  emptyDesc: '到「編發器」錄第一段聲音。',
   audioUnavailable: '音檔已不在此工作階段(重新整理/關閉分頁即消失)——此為紅線設計,非故障',
   download: '下載',
   deleteBtn: '刪除',

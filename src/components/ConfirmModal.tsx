@@ -47,8 +47,8 @@ export default function ConfirmModal({
         onClick={(e) => e.stopPropagation()}
         style={{ padding: 18, maxWidth: 380 }}
       >
-        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>{title}</div>
-        <div style={{ fontSize: 12.5, color: 'var(--text-sub)', lineHeight: 1.7, marginBottom: 16 }}>{desc}</div>
+        <div className="t-card-title" style={{ marginBottom: 8 }}>{title}</div>
+        <div className="t-sub" style={{ color: 'var(--text-sub)', marginBottom: 16 }}>{desc}</div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
           <button type="button" className="btn btn-ghost" onClick={onCancel}>
             {cancelLabel}

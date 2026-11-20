@@ -30,17 +30,15 @@ export default function RecordingsPage({ records, sessions, onPatch, onDelete }:
 
   return (
     <div>
-      <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)' }}>{RECORDS_COPY.pageTitle}</div>
-      <div style={{ fontSize: 12.5, color: 'var(--text-weak)', margin: '4px 0 20px' }}>{RECORDS_COPY.pageDesc}</div>
+      <div className="t-page-title">{RECORDS_COPY.pageTitle}</div>
+      <div className="t-page-desc" style={{ margin: '4px 0 20px' }}>{RECORDS_COPY.pageDesc}</div>
 
       <div
+        className="t-sub"
         style={{
           padding: '10px 12px',
           borderRadius: 10,
           background: 'var(--surface-soft)',
-          fontSize: 12,
-          color: 'var(--text-weak)',
-          lineHeight: 1.7,
           marginBottom: 16,
         }}
       >
@@ -49,10 +47,10 @@ export default function RecordingsPage({ records, sessions, onPatch, onDelete }:
 
       {records.length === 0 ? (
         <div className="card" style={{ padding: 22, textAlign: 'center' }}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>
+          <div className="t-sec-title" style={{ marginBottom: 6 }}>
             {RECORDS_COPY.emptyTitle}
           </div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-weak)' }}>{RECORDS_COPY.emptyDesc}</div>
+          <div className="t-sub">{RECORDS_COPY.emptyDesc}</div>
         </div>
       ) : (
         records.map((r) => {
@@ -68,14 +66,14 @@ export default function RecordingsPage({ records, sessions, onPatch, onDelete }:
                     if (v && v !== r.title) onPatch(r.id, { title: v });
                   }}
                   aria-label="錄音標題"
-                  style={{ fontWeight: 700, flex: 1 }}
+                  style={{ fontWeight: 'var(--weight-bold)', flex: 1 }}
                 />
                 {session && <span className="pill pill-brand">本工作階段</span>}
                 <button type="button" className="btn btn-ghost" onClick={() => setPendingDeleteId(r.id)}>
                   {RECORDS_COPY.deleteBtn}
                 </button>
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text-weak)', marginBottom: 10, fontVariantNumeric: 'tabular-nums' }}>
+              <div className="t-sub t-num" style={{ marginBottom: 10 }}>
                 {formatDateTime(r.createdAt)} · {RECORDS_COPY.kindLabel[r.kind]} · {formatDuration(r.durationSec)} ·{' '}
                 {formatBytes(r.sizeBytes)}
               </div>
@@ -92,7 +90,7 @@ export default function RecordingsPage({ records, sessions, onPatch, onDelete }:
                   </a>
                 </div>
               ) : (
-                <div style={{ fontSize: 11.5, color: 'var(--text-faint)', marginBottom: 10 }}>
+                <div className="t-meta" style={{ marginBottom: 10 }}>
                   {RECORDS_COPY.audioUnavailable}
                 </div>
               )}

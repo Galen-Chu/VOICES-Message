@@ -1,5 +1,5 @@
 /**
- * 殼層(V1 三頁籤):聲管 Dashboard / 錄音機 Record / 錄音記錄 Records。
+ * 殼層(V1 三頁籤):聲管 Dashboard / 編發器 Voices(2026-11-20 前名「錄音機 Record」) / 錄音記錄 Records。
  * hash 深連結(#record/#records,未知落 Dashboard;書籤與家族連結入口)。
  * 狀態分工:records=metadata(落地 services/recordings)、sessions=本工作階段音檔
  * (blob+object URL 僅記憶體——紅線:音檔絕不落地;刪除時 revoke URL)。
